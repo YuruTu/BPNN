@@ -3,7 +3,7 @@
 //如果你认为有必要打赏我，我的支付宝号是707101557@qq.com
 #include "pch.h"
 using namespace std;
-const double pi = atan(1.0) * 4;
+const double pi = atan(1.0) * 4.0;
 //BP神经网络结构
 struct BPNN {
 	int sample_count;//样本数量
@@ -254,24 +254,12 @@ BPNN CREATE_BPNN(int sc, int ic, int oc, int hc, double sr, double p, int lc) {
 }
 
 //返回一个double类型的随机数，这么做的目的是破坏神经网络结构的对称性
-//基本原理，参见独立同分布的中心极限定理
+//基本原理，参见利用Box-Muller变换生成正态分布的随机数（附代码）
+//https://blog.csdn.net/m0_37772174/article/details/81356434
 double rand_normal() {
-	int  i;
-	const int normal_count = 200;//样本数目采用200个
-	double ccl_num;
-	double ccl_s;
-	double ccl_ar[normal_count];
-	ccl_num = 0;
-
-	for (i = 0; i < normal_count; i++) {
-		ccl_ar[i] = rand() % 1000 / (double)1001;
-		ccl_num += ccl_ar[i];
-	}
-	ccl_num -= (normal_count / 2);//减去0-1均匀分布的均值
-	ccl_s = 1.0*normal_count / 12.0;//0-1分布的方差为1/12
-	ccl_s = sqrt(ccl_s);
-	ccl_num /= ccl_s;//此时ccl_num接近标准正态分布的一个子集
-	ccl_num /= 100;//变为正态分布（0，0.01）的一个子集，论文中有给出证明过程
-	cout << " 随机值" << ccl_num << endl;
+	double x1, x2;
+	x1 = rand() % RAND_MAX / (double)RAND_MAX;
+	x2 = rand() % RAND_MAX / (double)RAND_MAX;
+	ccl_num = sqrt(-2 * log(x1))*cos(2 * pi*x2);
 	return ccl_num;
 }
